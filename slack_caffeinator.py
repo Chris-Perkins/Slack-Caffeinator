@@ -13,7 +13,7 @@ import Quartz
 import rumps
 from AppKit import NSApplication, NSApplicationActivationPolicyAccessory
 
-# Hide from Application Dock
+# Run in the background, hidden from the application dock
 NSApplication.sharedApplication().setActivationPolicy_(
     NSApplicationActivationPolicyAccessory
 )
@@ -57,41 +57,41 @@ class KeepAwakeApp(rumps.App):
         ]
 
         self.caffeination_thread = threading.Thread(
-            target=self.caffeination_loop,
+            target=self._caffeination_loop,
             daemon=True,
         )
         self.caffeination_thread.start()
 
-    def caffeination_loop(self):
+    def _caffeination_loop(self):
+        print(f"[{datetime.now()}] Slack Caffeinator running")
         while True:
-            idle_time = self.get_idle_time()
-            current_time = datetime.now()
+            idle_time = self._get_seconds_since_last_user_input()
 
             if idle_time >= self.idle_threshold_seconds:
-                self.caffeinate()
+                self._caffeinate()
                 if self.is_beep_enabled:
-                    self.play_beep()
-                print(f"[{current_time}] Caffeinated")
+                    self._play_beep()
+                print(f"[{datetime.now()}] Caffeinated")
             else:
-                print(f"[{current_time}] User active, skipping caffeination")
+                print(f"[{datetime.now()}] User active, skipping caffeination")
 
             time.sleep(self.interval_seconds)
 
-    def get_idle_time(self):
+    def _get_seconds_since_last_user_input(self):
         """Get seconds since last user input (mouse/keyboard)."""
         return Quartz.CGEventSourceSecondsSinceLastEventType(
             Quartz.kCGEventSourceStateHIDSystemState,
             Quartz.kCGAnyInputEventType,
         )
 
-    def play_beep(self):
+    def _play_beep(self):
         """Play a basic beep sound using macOS afplay."""
         subprocess.run(
             ["afplay", "/System/Library/Sounds/Tink.aiff"],
             capture_output=True,
         )
 
-    def caffeinate(self):
+    def _caffeinate(self):
         """
         Prevent display and idle sleep using:
         1. macOS caffeinate command (keeps screen awake)
@@ -126,12 +126,6 @@ class KeepAwakeApp(rumps.App):
 
 
 if __name__ == "__main__":
-    print(
-        f"Keep Awake running - wiggling mouse every {CAFFEINATION_INTERVAL_SECONDS} seconds"
-    )
-    if IS_DEBUG_BEEP_ENABLED:
-        print("Beeping is enabled")
-
     app = KeepAwakeApp(
         interval_seconds=CAFFEINATION_INTERVAL_SECONDS,
         idle_threshold_seconds=IDLE_THRESHOLD_SECONDS,
