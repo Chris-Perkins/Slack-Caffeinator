@@ -1,12 +1,14 @@
-# Keep Awake
+# Slack Caffeinator
 
-Keeps your Slack status 'Online' by gently wiggling the mouse
+Keep your Slack status 'Online' by gently wiggling the mouse when you are idle
+
+Automatically launches when you login
 
 ![Example Screenshot](./screenshot.png)
 
 ## Requirements
 
-- Python Homebrew installation
+You need the Python Homebrew installation
 
 ```sh
 brew install Python
