@@ -1,6 +1,6 @@
 # Keep Awake
 
-Prevents your Mac from sleeping by wiggling the mouse every 2 minutes. Shows a ☕ icon in the menu bar.
+Keeps your Slack status 'Online' by gently wiggling the mouse
 
 ![Example Screenshot](./screenshot.png)
 

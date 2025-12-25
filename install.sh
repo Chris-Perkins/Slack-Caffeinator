@@ -16,9 +16,11 @@ mkdir -p "$DESTINATION_DIR"
 cp "$SOURCE_PATH" "$DESTINATION_PATH"
 chmod +x "$DESTINATION_PATH"
 
-# Install rumps using homebrew python
+# Install dependencies using homebrew python
 echo "Installing dependencies..."
-/opt/homebrew/bin/pip3 install rumps 2>/dev/null || pip3 install --break-system-packages rumps 2>/dev/null || pip3 install rumps
+/opt/homebrew/bin/pip3 install rumps pyobjc-framework-Quartz 2>/dev/null || \
+    pip3 install --break-system-packages rumps pyobjc-framework-Quartz 2>/dev/null || \
+    pip3 install rumps pyobjc-framework-Quartz
 
 # Create app bundle
 mkdir -p "$APP_PATH/Contents/MacOS"
