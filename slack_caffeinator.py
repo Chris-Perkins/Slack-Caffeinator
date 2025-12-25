@@ -13,8 +13,10 @@ from datetime import datetime
 import rumps
 from AppKit import NSApplication, NSApplicationActivationPolicyAccessory
 
-# Hide from Dock
-NSApplication.sharedApplication().setActivationPolicy_(NSApplicationActivationPolicyAccessory)
+# Hide from Application Dock
+NSApplication.sharedApplication().setActivationPolicy_(
+    NSApplicationActivationPolicyAccessory
+)
 
 # =============================================================================
 # Configuration
@@ -40,8 +42,7 @@ class KeepAwakeApp(rumps.App):
         self.is_beep_enabled = is_beep_enabled
 
         self.menu = [
-            rumps.MenuItem("Status: Active", callback=None),
-            rumps.MenuItem(f"Interval: {interval_seconds} seconds", callback=None),
+            rumps.MenuItem("Slack Caffeinator: Active", callback=None),
         ]
 
         self.wiggle_thread = threading.Thread(target=self.wiggle_loop, daemon=True)
