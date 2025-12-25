@@ -16,16 +16,16 @@ mkdir -p "$DESTINATION_DIR"
 cp "$SOURCE_PATH" "$DESTINATION_PATH"
 chmod +x "$DESTINATION_PATH"
 
+# Install rumps using homebrew python
+echo "Installing dependencies..."
+/opt/homebrew/bin/pip3 install rumps 2>/dev/null || pip3 install --break-system-packages rumps 2>/dev/null || pip3 install rumps
+
 # Create a launcher wrapper (Login Items needs an app or .command file)
 cat > "$WRAPPER_PATH" << 'EOF'
 #!/bin/bash
-/usr/bin/python3 "$HOME/Scripts/slack_caffeinator.py"
+/opt/homebrew/bin/python3 "$HOME/Scripts/slack_caffeinator.py"
 EOF
 chmod +x "$WRAPPER_PATH"
-
-# Install rumps if needed
-echo "Installing dependencies..."
-pip3 install --break-system-packages rumps 2>/dev/null || pip3 install --user rumps 2>/dev/null || pip3 install rumps
 
 # Add to Login Items using AppleScript
 osascript << EOF

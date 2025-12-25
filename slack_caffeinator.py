@@ -11,6 +11,10 @@ import time
 from datetime import datetime
 
 import rumps
+from AppKit import NSApplication, NSApplicationActivationPolicyAccessory
+
+# Hide from Dock
+NSApplication.sharedApplication().setActivationPolicy_(NSApplicationActivationPolicyAccessory)
 
 # =============================================================================
 # Configuration
