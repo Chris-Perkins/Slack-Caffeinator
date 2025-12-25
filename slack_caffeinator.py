@@ -50,11 +50,11 @@ class KeepAwakeApp(rumps.App):
 
     def wiggle_loop(self):
         while True:
-            self.move_mouse()
+            self.caffeinate()
             if self.is_beep_enabled:
                 self.play_beep()
             current_time = datetime.now()
-            print(f"[{current_time}] Mouse wiggled")
+            print(f"[{current_time}] Screen caffeinated")
             time.sleep(self.interval_seconds)
 
     def play_beep(self):
@@ -63,24 +63,29 @@ class KeepAwakeApp(rumps.App):
             ["afplay", "/System/Library/Sounds/Tink.aiff"], capture_output=True
         )
 
-    def move_mouse(self):
-        """Move the mouse slightly using AppleScript (macOS)."""
+    def caffeinate(self):
+        """
+        Prevent display and idle sleep using:
+        1.MacOS caffeinate
+        2.Wiggling the mouse.
+        """
+        subprocess.Popen(["caffeinate", "-d", "-i", "-t", str(self.interval_seconds)])
         subprocess.run(
             [
                 "osascript",
                 "-e",
                 """
-        tell application "System Events"
-            set mousePos to do shell script "python3 -c 'import Quartz; pos = Quartz.NSEvent.mouseLocation(); print(int(pos.x), int(1080 - pos.y))'"
-            set {x, y} to words of mousePos
-            set x to x as integer
-            set y to y as integer
-            -- Move mouse 1 pixel and back
-            do shell script "python3 -c 'import Quartz; from Quartz import CGEventCreateMouseEvent, kCGEventMouseMoved, CGEventPost, kCGHIDEventTap; e = CGEventCreateMouseEvent(None, kCGEventMouseMoved, (" & (x + 1) & ", " & y & "), 0); CGEventPost(kCGHIDEventTap, e)'"
-            delay 0.1
-            do shell script "python3 -c 'import Quartz; from Quartz import CGEventCreateMouseEvent, kCGEventMouseMoved, CGEventPost, kCGHIDEventTap; e = CGEventCreateMouseEvent(None, kCGEventMouseMoved, (" & x & ", " & y & "), 0); CGEventPost(kCGHIDEventTap, e)'"
-        end tell
-        """,
+                tell application "System Events"
+                    set mousePos to do shell script "python3 -c 'import Quartz; pos = Quartz.NSEvent.mouseLocation(); print(int(pos.x), int(1080 - pos.y))'"
+                    set {x, y} to words of mousePos
+                    set x to x as integer
+                    set y to y as integer
+                    -- Move mouse 1 pixel and back
+                    do shell script "python3 -c 'import Quartz; from Quartz import CGEventCreateMouseEvent, kCGEventMouseMoved, CGEventPost, kCGHIDEventTap; e = CGEventCreateMouseEvent(None, kCGEventMouseMoved, (" & (x + 1) & ", " & y & "), 0); CGEventPost(kCGHIDEventTap, e)'"
+                    delay 0.1
+                    do shell script "python3 -c 'import Quartz; from Quartz import CGEventCreateMouseEvent, kCGEventMouseMoved, CGEventPost, kCGHIDEventTap; e = CGEventCreateMouseEvent(None, kCGEventMouseMoved, (" & x & ", " & y & "), 0); CGEventPost(kCGHIDEventTap, e)'"
+                end tell
+                """,
             ],
             capture_output=True,
         )
