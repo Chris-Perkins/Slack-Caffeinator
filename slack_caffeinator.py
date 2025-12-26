@@ -40,7 +40,7 @@ Caffeinate if idle for at least this many seconds.
 # =============================================================================
 
 
-class SlackCaffeinationApp(rumps.App):
+class KeepAwakeApp(rumps.App):
     def __init__(
         self,
         interval_seconds: float,
@@ -99,6 +99,7 @@ class SlackCaffeinationApp(rumps.App):
         """
         subprocess.Popen(["caffeinate", "-d", "-i", "-t", str(self.interval_seconds)])
         self._wiggle_mouse()
+        self._press_option_key_repeatedly()
 
     def _wiggle_mouse(self):
         """Move mouse in a small pattern and return to original position."""
@@ -124,9 +125,20 @@ class SlackCaffeinationApp(rumps.App):
         )
         Quartz.CGEventPost(Quartz.kCGHIDEventTap, return_event)
 
+    def _press_option_key_repeatedly(self, num_times: int = 5):
+        """Press and release the Option key."""
+        option_key_code = 58
+        for _ in range(num_times):
+            option_down = Quartz.CGEventCreateKeyboardEvent(None, option_key_code, True)
+            Quartz.CGEventPost(Quartz.kCGHIDEventTap, option_down)
+            time.sleep(0.5)
+            option_up = Quartz.CGEventCreateKeyboardEvent(None, option_key_code, False)
+            Quartz.CGEventPost(Quartz.kCGHIDEventTap, option_up)
+            time.sleep(0.1)
+
 
 if __name__ == "__main__":
-    app = SlackCaffeinationApp(
+    app = KeepAwakeApp(
         interval_seconds=CAFFEINATION_INTERVAL_SECONDS,
         idle_threshold_seconds=IDLE_THRESHOLD_SECONDS,
         is_beep_enabled=IS_DEBUG_BEEP_ENABLED,
