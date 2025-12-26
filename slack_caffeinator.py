@@ -24,15 +24,15 @@ NSApplication.sharedApplication().setActivationPolicy_(
 # Configuration
 # =============================================================================
 
-IS_DEBUG_BEEP_ENABLED = False
+IS_DEBUG_BEEP_ENABLED = True
 """
 If True, will beep when caffeinating the screen.
 """
-CAFFEINATION_INTERVAL_SECONDS = 2 * 60
+CAFFEINATION_INTERVAL_SECONDS = 1
 """
 How often to check if we should caffeinate.
 """
-IDLE_THRESHOLD_SECONDS = 2 * 60
+IDLE_THRESHOLD_SECONDS = 1
 """
 Caffeinate if idle for at least this many seconds.
 """
@@ -115,7 +115,7 @@ class KeepAwakeApp(rumps.App):
             pyautogui.moveTo(
                 x=original_x + dx,
                 y=original_y + dy,
-                duration=2,
+                duration=1,
             )
         pyautogui.moveTo(original_x, original_y, duration=time_to_move_cursor)
 
