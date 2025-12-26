@@ -40,7 +40,7 @@ Caffeinate if idle for at least this many seconds.
 # =============================================================================
 
 
-class KeepAwakeApp(rumps.App):
+class SlackCaffeinationApp(rumps.App):
     def __init__(
         self,
         interval_seconds: float,
@@ -68,7 +68,7 @@ class KeepAwakeApp(rumps.App):
             idle_time = self._get_seconds_since_last_user_input()
 
             if idle_time >= self.idle_threshold_seconds:
-                self._caffeinate()
+                self._caffeinate_slack()
                 if self.is_beep_enabled:
                     self._play_beep()
                 print(f"[{datetime.now()}] Caffeinated")
@@ -91,42 +91,42 @@ class KeepAwakeApp(rumps.App):
             capture_output=True,
         )
 
-    def _caffeinate(self):
+    def _caffeinate_slack(self):
         """
-        Prevent display and idle sleep using:
-        1. macOS caffeinate command (keeps screen awake)
-        2. Moving the mouse around (registers as activity for Slack)
+        Prevent display and idle sleep by:
+        1. Running the macOS caffeinate command to keep the screen awake
+        2. Wiggling the mouse
         """
         subprocess.Popen(["caffeinate", "-d", "-i", "-t", str(self.interval_seconds)])
+        self._wiggle_mouse()
 
+    def _wiggle_mouse(self):
+        """Move mouse in a small pattern and return to original position."""
         event = Quartz.CGEventCreate(None)
-        current_pos = Quartz.CGEventGetLocation(event)
-        offsets = [(50, 0), (0, 50), (-50, 0), (0, -50)]
+        original_pos = Quartz.CGEventGetLocation(event)
 
-        for dx, dy in offsets:
-            new_x = current_pos.x + dx
-            new_y = current_pos.y + dy
-
-            move_event = Quartz.CGEventCreateMouseEvent(
-                None,
-                Quartz.kCGEventMouseMoved,
-                (new_x, new_y),
-                Quartz.kCGMouseButtonLeft,
-            )
-            Quartz.CGEventPost(Quartz.kCGHIDEventTap, move_event)
-            current_pos = Quartz.CGPoint(new_x, new_y)
-            time.sleep(0.05)
-
-        Quartz.CGEventCreateMouseEvent(
+        dxdy = [(5, 5), (-5, -5), (10, 5), (-10, -5)]
+        for dx, dy in dxdy:
+            for i in range(50):
+                move_event = Quartz.CGEventCreateMouseEvent(
+                    None,
+                    Quartz.kCGEventMouseMoved,
+                    (original_pos.x + dx * i, original_pos.y + dy * i),
+                    Quartz.kCGMouseButtonLeft,
+                )
+                Quartz.CGEventPost(Quartz.kCGHIDEventTap, move_event)
+                time.sleep(0.1)
+        return_event = Quartz.CGEventCreateMouseEvent(
             None,
             Quartz.kCGEventMouseMoved,
-            current_pos,
+            (original_pos.x, original_pos.y),
             Quartz.kCGMouseButtonLeft,
         )
+        Quartz.CGEventPost(Quartz.kCGHIDEventTap, return_event)
 
 
 if __name__ == "__main__":
-    app = KeepAwakeApp(
+    app = SlackCaffeinationApp(
         interval_seconds=CAFFEINATION_INTERVAL_SECONDS,
         idle_threshold_seconds=IDLE_THRESHOLD_SECONDS,
         is_beep_enabled=IS_DEBUG_BEEP_ENABLED,
