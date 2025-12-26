@@ -18,9 +18,9 @@ chmod +x "$DESTINATION_PATH"
 
 # Install dependencies using homebrew python
 echo "Installing dependencies..."
-/opt/homebrew/bin/pip3 install rumps pyobjc-framework-Quartz 2>/dev/null || \
-    pip3 install --break-system-packages rumps pyobjc-framework-Quartz 2>/dev/null || \
-    pip3 install rumps pyobjc-framework-Quartz
+/opt/homebrew/bin/pip3 install rumps pyobjc-framework-Quartz pyautogui 2>/dev/null || \
+    pip3 install --break-system-packages rumps pyobjc-framework-Quartz pyautogui 2>/dev/null || \
+    pip3 install rumps pyobjc-framework-Quartz pyautogui
 
 # Create app bundle
 mkdir -p "$APP_PATH/Contents/MacOS"
