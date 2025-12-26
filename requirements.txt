@@ -1,0 +1,4 @@
+AppKit==0.2.8
+pyautogui==0.9.54
+Quartz==0.0.1.dev0
+rumps==0.4.0
