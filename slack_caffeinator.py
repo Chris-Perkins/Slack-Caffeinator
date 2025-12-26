@@ -9,6 +9,8 @@ import threading
 import time
 from datetime import datetime
 
+
+import pyautogui
 import Quartz
 import rumps
 from AppKit import NSApplication, NSApplicationActivationPolicyAccessory
@@ -26,11 +28,11 @@ IS_DEBUG_BEEP_ENABLED = False
 """
 If True, will beep when caffeinating the screen.
 """
-CAFFEINATION_INTERVAL_SECONDS = 120
+CAFFEINATION_INTERVAL_SECONDS = 2 * 60
 """
 How often to check if we should caffeinate.
 """
-IDLE_THRESHOLD_SECONDS = 60
+IDLE_THRESHOLD_SECONDS = 2 * 60
 """
 Caffeinate if idle for at least this many seconds.
 """
@@ -99,42 +101,23 @@ class KeepAwakeApp(rumps.App):
         """
         subprocess.Popen(["caffeinate", "-d", "-i", "-t", str(self.interval_seconds)])
         self._wiggle_mouse()
-        self._press_option_key_repeatedly()
 
     def _wiggle_mouse(self):
         """Move mouse in a small pattern and return to original position."""
-        event = Quartz.CGEventCreate(None)
-        original_pos = Quartz.CGEventGetLocation(event)
 
-        dxdy = [(5, 5), (-5, -5), (10, 5), (-10, -5)]
+        pyautogui.FAILSAFE = False
+
+        original_x, original_y = pyautogui.position()
+        time_to_move_cursor = 0.00005
+
+        dxdy = [(50, 50), (-50, -50), (200, 200), (-200, -200)]
         for dx, dy in dxdy:
-            for i in range(50):
-                move_event = Quartz.CGEventCreateMouseEvent(
-                    None,
-                    Quartz.kCGEventMouseMoved,
-                    (original_pos.x + dx * i, original_pos.y + dy * i),
-                    Quartz.kCGMouseButtonLeft,
-                )
-                Quartz.CGEventPost(Quartz.kCGHIDEventTap, move_event)
-                time.sleep(0.1)
-        return_event = Quartz.CGEventCreateMouseEvent(
-            None,
-            Quartz.kCGEventMouseMoved,
-            (original_pos.x, original_pos.y),
-            Quartz.kCGMouseButtonLeft,
-        )
-        Quartz.CGEventPost(Quartz.kCGHIDEventTap, return_event)
-
-    def _press_option_key_repeatedly(self, num_times: int = 10):
-        """Press and release the Option key."""
-        option_key_code = 58
-        for _ in range(num_times):
-            option_down = Quartz.CGEventCreateKeyboardEvent(None, option_key_code, True)
-            Quartz.CGEventPost(Quartz.kCGHIDEventTap, option_down)
-            time.sleep(0.5)
-            option_up = Quartz.CGEventCreateKeyboardEvent(None, option_key_code, False)
-            Quartz.CGEventPost(Quartz.kCGHIDEventTap, option_up)
-            time.sleep(0.1)
+            pyautogui.moveTo(
+                x=original_x + dx,
+                y=original_y + dy,
+                duration=2,
+            )
+        pyautogui.moveTo(original_x, original_y, duration=time_to_move_cursor)
 
 
 if __name__ == "__main__":
