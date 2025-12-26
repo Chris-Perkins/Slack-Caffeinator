@@ -125,7 +125,7 @@ class KeepAwakeApp(rumps.App):
         )
         Quartz.CGEventPost(Quartz.kCGHIDEventTap, return_event)
 
-    def _press_option_key_repeatedly(self, num_times: int = 5):
+    def _press_option_key_repeatedly(self, num_times: int = 10):
         """Press and release the Option key."""
         option_key_code = 58
         for _ in range(num_times):
