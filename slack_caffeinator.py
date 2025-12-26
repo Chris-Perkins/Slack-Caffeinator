@@ -24,15 +24,15 @@ NSApplication.sharedApplication().setActivationPolicy_(
 # Configuration
 # =============================================================================
 
-IS_DEBUG_BEEP_ENABLED = True
+IS_DEBUG_BEEP_ENABLED = False
 """
 If True, will beep when caffeinating the screen.
 """
-CAFFEINATION_INTERVAL_SECONDS = 1
+CAFFEINATION_INTERVAL_SECONDS = 2 * 60
 """
 How often to check if we should caffeinate.
 """
-IDLE_THRESHOLD_SECONDS = 1
+IDLE_THRESHOLD_SECONDS = 2 * 60
 """
 Caffeinate if idle for at least this many seconds.
 """
