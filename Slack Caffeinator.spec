@@ -1,5 +1,4 @@
 # -*- mode: python ; coding: utf-8 -*-
-# Pyinstaller spec
 
 
 a = Analysis(
@@ -7,7 +6,7 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=[],
-    hiddenimports=['rumps', 'pyobjc-framework-Quartz', 'pyobjc-framework-Cocoa'],
+    hiddenimports=[],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
