@@ -103,20 +103,45 @@ class KeepAwakeApp(rumps.App):
         self._wiggle_mouse()
 
     def _wiggle_mouse(self):
-        """Move mouse in a small pattern and return to original position."""
+        """Move mouse in a small pattern and return to original position.
+
+        If the user moves the mouse during caffeination, the wiggle is
+        interrupted and the mouse is left at its current position.
+        """
 
         pyautogui.FAILSAFE = False
 
         original_x, original_y = pyautogui.position()
         time_to_move_cursor = 0.00005
+        position_tolerance = 5  # pixels of tolerance for position checking
 
         dxdy = [(50, 50), (-50, -50), (200, 200), (-200, -200)]
+        expected_x, expected_y = original_x, original_y
+
         for dx, dy in dxdy:
-            pyautogui.moveTo(
-                x=original_x + dx,
-                y=original_y + dy,
-                duration=1,
-            )
+            # Check if user moved the mouse since last movement
+            current_x, current_y = pyautogui.position()
+            if (
+                abs(current_x - expected_x) > position_tolerance
+                or abs(current_y - expected_y) > position_tolerance
+            ):
+                print(f"[{datetime.now()}] User moved mouse, interrupting caffeination")
+                return  # User moved the mouse, stop wiggling
+
+            target_x = original_x + dx
+            target_y = original_y + dy
+            pyautogui.moveTo(x=target_x, y=target_y, duration=1)
+            expected_x, expected_y = target_x, target_y
+
+        # Final check before returning to original position
+        current_x, current_y = pyautogui.position()
+        if (
+            abs(current_x - expected_x) > position_tolerance
+            or abs(current_y - expected_y) > position_tolerance
+        ):
+            print(f"[{datetime.now()}] User moved mouse, interrupting caffeination")
+            return
+
         pyautogui.moveTo(original_x, original_y, duration=time_to_move_cursor)
 
 
