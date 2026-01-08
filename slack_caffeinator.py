@@ -36,6 +36,10 @@ IDLE_THRESHOLD_SECONDS = 2 * 60
 """
 Caffeinate if idle for at least this many seconds.
 """
+IS_CAFFEINATION_ENABLED_DURING_ZOOM_MEETINGS = False
+"""
+If True, caffeination will be disabled while in a Zoom meeting.
+"""
 
 # =============================================================================
 # Application
@@ -48,11 +52,15 @@ class KeepAwakeApp(rumps.App):
         interval_seconds: float,
         idle_threshold_seconds: float,
         is_beep_enabled: bool,
+        is_caffeination_enabled_during_zoom_meetings: bool,
     ):
         super().__init__("I'm Awake!", title="☕")
         self.interval_seconds = interval_seconds
         self.idle_threshold_seconds = idle_threshold_seconds
         self.is_beep_enabled = is_beep_enabled
+        self.is_caffeination_enabled_during_zoom_meetings = (
+            is_caffeination_enabled_during_zoom_meetings
+        )
 
         self.menu = [
             rumps.MenuItem("Slack Caffeinator: Active", callback=None),
@@ -70,14 +78,27 @@ class KeepAwakeApp(rumps.App):
             idle_time = self._get_seconds_since_last_user_input()
 
             if idle_time >= self.idle_threshold_seconds:
-                self._caffeinate_slack()
-                if self.is_beep_enabled:
-                    self._play_beep()
-                print(f"[{datetime.now()}] Caffeinated")
-            else:
-                print(f"[{datetime.now()}] User active, skipping caffeination")
-
+                if (
+                    not self.is_caffeination_enabled_during_zoom_meetings
+                    and self._is_zoom_meeting_active()
+                ):
+                    print(
+                        f"[{datetime.now()}] Zoom meeting active, skipping caffeination"
+                    )
+                else:
+                    self._caffeinate_slack()
+                    if self.is_beep_enabled:
+                        self._play_beep()
+                    print(f"[{datetime.now()}] Caffeinated")
             time.sleep(self.interval_seconds)
+
+    def _is_zoom_meeting_active(self) -> bool:
+        """Check if a Zoom meeting is currently active by checking for the CptHost process."""
+        result = subprocess.run(
+            ["pgrep", "-x", "CptHost"],
+            capture_output=True,
+        )
+        return result.returncode == 0
 
     def _get_seconds_since_last_user_input(self):
         """Get seconds since last user input (mouse/keyboard)."""
@@ -150,5 +171,6 @@ if __name__ == "__main__":
         interval_seconds=CAFFEINATION_INTERVAL_SECONDS,
         idle_threshold_seconds=IDLE_THRESHOLD_SECONDS,
         is_beep_enabled=IS_DEBUG_BEEP_ENABLED,
+        is_caffeination_enabled_during_zoom_meetings=IS_CAFFEINATION_ENABLED_DURING_ZOOM_MEETINGS,
     )
     app.run()
