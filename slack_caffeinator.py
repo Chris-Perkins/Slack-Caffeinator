@@ -38,7 +38,8 @@ Caffeinate if idle for at least this many seconds.
 """
 IS_CAFFEINATION_ENABLED_DURING_ZOOM_MEETINGS = False
 """
-If True, caffeination will be disabled while in a Zoom meeting.
+If True, caffeination can occur while in a Zoom meeting.
+Disabled by default to save you embarrassment while sharing your screen.
 """
 
 # =============================================================================
