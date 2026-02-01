@@ -28,7 +28,7 @@ IS_DEBUG_BEEP_ENABLED = False
 """
 If True, will beep when caffeinating the screen.
 """
-CAFFEINATION_INTERVAL_SECONDS = 2 * 60
+CAFFEINATION_INTERVAL_SECONDS = 1 * 60
 """
 How often to check if we should caffeinate.
 """
